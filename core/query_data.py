@@ -2,11 +2,14 @@ import requests
 import base64
 import pandas as pd
 from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
+import os
 
 # --- CONFIGURATION ---
 
 # Base64 API token from UDL utility
-basicAuth = "Basic dGFydW4ucHJha2FzaDpCeXdtdWstcWluemkyLWd1cndvbg=="
+load_dotenv()  # take environment variables
+basicAuth = os.getenv('basicAuth')
 
 # Define satellite
 satellite_number = 25544
