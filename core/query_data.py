@@ -55,5 +55,5 @@ for entry in data:
 
 # Convert to DataFrame
 df = pd.DataFrame(parsed_data)
-df.to_csv(f'core/satellite_{satellite_number}_data.csv', index=False)
+df.to_csv(f'data/satellite_{satellite_number}_data.csv', index=False)
 print(f"Data saved to satellite_{satellite_number}_data.csv")

@@ -71,10 +71,14 @@ This script:
 
 ```
 core/
-├── query_data.py         # Pull UDL state vector data and save as CSV
-├── upload_to_nominal.py  # Create asset/run in Nominal with timestamps
+├── create_asset.py            # Create new asset in Nominal
+├── create_run.py              # Create run object in Nominal
+├── query_data.py              # Pull UDL state vector data and save as CSV
+├── retrieve_asset.py          # Retrieve asset by platform/serial
+├── sample_query_data.py       # Example of working UDL API query
+├── upload_data.py             # Create run in Nominal using timestamps
 data/
-└── satellite_data.csv    # Output CSV with parsed telemetry
+├── satellite_25544_data.csv   # Output CSV with parsed telemetry
 ```
 
 ---
@@ -106,7 +110,7 @@ Created run in Nominal: "ISS Historical Pass 2024-07-01 to 2024-07-02"
 
 ## 🧑‍💻 Author
 
-Tarun Prakash — [@tarun_prakash](https://github.com/tarunprakash)
+Tarun Prakash — [@tarunprakash2468](https://github.com/tarunprakash2468)
 
 Built for satellite telemetry test workflows and backend integration with Nominal.
 
