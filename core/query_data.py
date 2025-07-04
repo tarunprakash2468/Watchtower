@@ -1,26 +1,45 @@
 import requests
+import urllib3
 import base64
+import os
+import inquirer
+import json
 import pandas as pd
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
-import os
 
 # --- CONFIGURATION ---
 
 # Base64 API token from UDL utility
 load_dotenv()  # take environment variables
 basicAuth = os.getenv('basicAuth')
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Define satellite
-satellite_number = 25544
+satellite_number = input("Enter the satellite number (e.g. 25544 for ISS): ")
+
+# Define which UDL API to use
+questions = [
+    inquirer.List(
+        "API",
+        message="Which UDL API should be used?",
+        choices=["Rest API", "History Rest API", "Bulk Data Request API", "Secure Messaging API"],
+    ),
+]
+
+answers = inquirer.prompt(questions)
 
 # Define time window
-now = datetime.now(timezone.utc)
-previous = now - timedelta(days=2500)
+def get_valid_date(prompt_label="time"):
+    while True:
+        date_str = input(f"Enter {prompt_label} (ISO 8601, e.g. 2025-07-03T18:30:00.00Z): ")
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            print("Invalid date format. Please use ISO 8601 format.")
 
-# Format the time window for the query
-start_time = previous.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-end_time = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+start_time = get_valid_date(prompt_label="start date & time").strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+end_time = get_valid_date(prompt_label="end date & time").strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 # Build the query URL
 base_url = "https://unifieddatalibrary.com"
@@ -34,6 +53,8 @@ query_url = (
 
 response = requests.get(query_url, headers={'Authorization': basicAuth}, verify=False)
 data = response.json()
+
+print(json.dumps(data, indent=2))
 
 # --- EXTRACT FIELDS ---
 
