@@ -1,10 +1,4 @@
-import requests
-import urllib3
-import base64
-import os
-import inquirer
-import json
-import pandas as pd
+import base64, json, os, pandas, questionary, requests, sys, urllib3
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
@@ -17,22 +11,29 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Define satellite
 satellite_number = input("Enter the satellite number (e.g. 25544 for ISS): ")
+print()
 
 # Define which UDL API to use
-questions = [
-    inquirer.List(
-        "API",
-        message="Which UDL API should be used?",
-        choices=["Rest API", "History Rest API", "Bulk Data Request API", "Secure Messaging API"],
-    ),
-]
+answer = questionary.select(
+    "Which UDL API should be used?",
+    choices=[
+        questionary.Choice(title="Rest API              — fast access for recent data", value="Rest API"),
+        questionary.Choice(title="History Rest API      — archived time series, forensic analysis", value="History Rest API"),
+        questionary.Choice(title="Bulk Data Request API — async large dataset export (CSV/JSON)", value="Bulk Data Request API"),
+        questionary.Choice(title="Secure Messaging API  — real-time streaming (restricted)", value="Secure Messaging API"),
+    ]
+).ask()
+print()
 
-answers = inquirer.prompt(questions)
+# End program if Secure Messaging API is selected
+if answer == 'Secure Messaging API':
+    print("Secure Messaging API requires access request. Please contact UDL support for access.")
+    sys.exit()
 
 # Define time window
 def get_valid_date(prompt_label="time"):
     while True:
-        date_str = input(f"Enter {prompt_label} (ISO 8601, e.g. 2025-07-03T18:30:00.00Z): ")
+        date_str = input(f"Enter {prompt_label} (ISO 8601, e.g. 2025-07-03T18:30:00.000000Z): ")
         try:
             return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%fZ")
         except ValueError:
@@ -43,18 +44,36 @@ end_time = get_valid_date(prompt_label="end date & time").strftime("%Y-%m-%dT%H:
 
 # Build the query URL
 base_url = "https://unifieddatalibrary.com"
-query_url = (
-    f"{base_url}/udl/statevector?"
-    f"epoch={start_time}..{end_time}&"
-    f"satNo={satellite_number}"
-)
+query_url = None
+
+if answer == "Rest API":
+    query_url = f"{base_url}/udl/statevector?epoch={start_time}..{end_time}&satNo={satellite_number}"
+elif answer == "History Rest API":
+    query_url = f"{base_url}/udl/statevector/history?epoch={start_time}..{end_time}&satNo={satellite_number}"
+elif answer == "Bulk Data Request API":
+    query_url = f"{base_url}/udl/statevector/history/aodr?epoch={start_time}..{end_time}&satNo={satellite_number}&outputFormat=JSON"
+elif answer == "Secure Messaging API":
+    exit()
+
+if query_url is None:
+    print("Query URL could not be determined.")
+    exit()
 
 # --- MAKE THE REQUEST ---
 
 response = requests.get(query_url, headers={'Authorization': basicAuth}, verify=False)
-data = response.json()
 
-print(json.dumps(data, indent=2))
+if response.status_code == 200:
+    try:
+        data = response.json()
+    except json.decoder.JSONDecodeError:
+        print("Response was not valid JSON:")
+        print(response.text)
+        exit()
+else:
+    print(f"Request failed with status code {response.status_code}")
+    print(response.text)
+    exit()
 
 # --- EXTRACT FIELDS ---
 
@@ -75,6 +94,6 @@ for entry in data:
         print(f'Skipping entry due to missing key: {e}')
 
 # Convert to DataFrame
-df = pd.DataFrame(parsed_data)
+df = pandas.DataFrame(parsed_data)
 df.to_csv(f'data/satellite_{satellite_number}_data.csv', index=False)
-print(f"Data saved to satellite_{satellite_number}_data.csv")
+print(f"\nData saved to satellite_{satellite_number}_data.csv")
