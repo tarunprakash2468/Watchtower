@@ -7,9 +7,14 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
     - name: Checkout code
@@ -25,22 +30,3 @@ jobs:
 
     - name: Sync dependencies
       run: pip-sync requirements.txt
-
-    - name: Run script
-      run: python core/import_udl_to_nominal.py
-
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
