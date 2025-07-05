@@ -36,3 +36,9 @@ jobs:
 
     - name: Run flake8
       run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Install test dependencies
+      run: pip install pytest
+
+    - name: Run unit tests
+      run: pytest --disable-warnings --maxfail=1
