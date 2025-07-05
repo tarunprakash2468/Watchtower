@@ -1,15 +1,13 @@
-import json, nominal, os, pandas, questionary, requests, sys, urllib3
-from datetime import datetime
+import base64, json, nominal, os, pandas, questionary, requests, sys
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from nominal.core import NominalClient
-
 # --- SETUP & CONFIG ---
 
 # API token from .env file
 load_dotenv()
 basicAuth = os.getenv('basicAuth')
 n2yo_key = os.getenv('n2yo_key')
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Get a client to interact with Nominal.
 client = NominalClient.from_profile("watchtower")
@@ -38,7 +36,7 @@ if answer == 'Secure Messaging API':
     sys.exit()
 
 # Define time window
-def get_valid_date(prompt_label: str = "time") -> datetime:
+def get_valid_date(prompt_label="time"):
     while True:
         date_str = input(f"Enter {prompt_label} (ISO 8601, e.g. 2025-07-03T18:30:00.000000Z): ")
         try:
@@ -90,7 +88,7 @@ else:
 # --- PARSE DATA ---
 
 # Parse data from JSON
-parsed_data: list[dict[str, object]] = []
+parsed_data = []
 for entry in data:
     try:
         parsed_data.append({
