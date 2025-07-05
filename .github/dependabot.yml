@@ -1,0 +1,12 @@
+# .github/dependabot.yml
+
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/requirements"
+    schedule:
+      interval: "daily"
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
