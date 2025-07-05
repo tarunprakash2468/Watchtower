@@ -7,7 +7,7 @@
 - 🔐 Authenticates with UDL using a Base64 token
 - 📡 Pulls state vector data for specified satellites (`satNo`)
 - 📁 Exports clean telemetry as `.csv`
-- 🔗 Creates corresponding "Runs" in Nominal, linked to digital "Assets"
+- 🔗 Integrates with Nominal by preparing data for test runs
 - 📅 Automatically handles UTC timestamps and historical data
 
 ## 🛠️ Setup
@@ -25,45 +25,33 @@ cd watchtower
 pip install -r requirements.txt
 ```
 
-### 3. Create a `.env` file or configure manually
+### 3. Configure Environment
 
 You’ll need:
 
 - A UDL Base64 token
-- A valid satellite catalog number (`satNo`)
-- Nominal API credentials (set up via `nom` CLI or SDK)
+- A N2YO API key
+- Nominal API credentials
+
+Set these as environment variables in a `.env` file or export them manually.
 
 ---
 
-## 🛰️ Pulling State Vector Data
+## 🛰️ Pulling and Processing State Vector Data
+
+The main script for data ingestion and processing is:
 
 ```python
-python core/query_data.py
+python core/import_udl_to_nominal.py
 ```
 
-This script pulls historical state vector data for a given satellite over a specified time window and saves it to `satellite_data.csv`.
+This script pulls historical state vector data for a given satellite over a specified time window from UDL and saves it to a CSV file in the `data/` directory (e.g., `satellite_25544_data.csv`).
 
 You can configure:
 
-- `satellite_number = 25544`  # ISS example
-- `now` and `yesterday` time window (default is past 7 days or longer)
-- UDL endpoint + filters: `epoch=...&satNo=...`
-
----
-
-## 🔗 Creating a Run in Nominal
-
-After generating data:
-
-```python
-python core/upload_to_nominal.py
-```
-
-This script:
-
-- Retrieves the asset in Nominal matching `platform` + `serial_num`
-- Creates a new run using timestamps from the dataset
-- Attaches metadata and links the run to the asset
+- `satellite_number` (e.g., `25544` for ISS)
+- Time window (default: past 7 days)
+- UDL endpoint and filters
 
 ---
 
@@ -71,32 +59,12 @@ This script:
 
 ```
 core/
-├── create_asset.py            # Create new asset in Nominal
-├── create_run.py              # Create run object in Nominal
-├── query_data.py              # Pull UDL state vector data and save as CSV
-├── retrieve_asset.py          # Retrieve asset by platform/serial
-├── sample_query_data.py       # Example of working UDL API query
-├── upload_data.py             # Create run in Nominal using timestamps
-data/
-├── satellite_25544_data.csv   # Output CSV with parsed telemetry
+├── import_udl_to_nominal.py      # Main script: pulls UDL data and prepares for Nominal
+data/                             # Output CSV with parsed telemetry
+├── satellite_25544_data.csv      
+├── satellite_25545_data.csv
+├── satellite_46826_data.csv
 ```
-
----
-
-## ✅ Example Output
-
-```
-Data saved to 'satellite_data.csv'
-Created run in Nominal: "ISS Historical Pass 2024-07-01 to 2024-07-02"
-```
-
----
-
-## 🧠 Notes
-
-- UDL API uses HTTPS with a token-based Basic Auth scheme
-- Nominal SDK requires the asset to exist or be created beforehand
-- All times are handled in UTC with `datetime.timezone.utc`
 
 ---
 
