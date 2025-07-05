@@ -8,11 +8,14 @@ from nominal.core import NominalClient
 # API token from .env file
 load_dotenv()
 basicAuth = os.getenv('basicAuth')
+nom_key = os.getenv('nom_key')
 n2yo_key = os.getenv('n2yo_key')
+if not (basicAuth and nom_key and n2yo_key):
+    raise ValueError("Secrets are not set in environment variables")
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Get a client to interact with Nominal.
-client = NominalClient.from_profile("watchtower")
+client = NominalClient.from_token(nom_key)
 
 # --- USER INPUT ---
 
