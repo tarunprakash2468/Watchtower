@@ -1,0 +1,27 @@
+name: 'lint'
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install linter
+      run: pip install flake8
+
+    - name: Run flake8
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics

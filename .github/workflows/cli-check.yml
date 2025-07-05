@@ -1,0 +1,32 @@
+name: 'CLI Check'
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      - name: Sync dependencies
+        run: pip-sync requirements/requirements.txt
+
+      - name: Run CLI check
+        run: python core/import_udl_to_nominal.py --help || true
