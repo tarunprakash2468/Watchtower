@@ -1,4 +1,4 @@
-import json, nominal, os, pandas, questionary, requests, sys, urllib3
+import json, os, pandas, questionary, requests, sys, urllib3
 from datetime import datetime
 from dotenv import load_dotenv
 from nominal.core import NominalClient
