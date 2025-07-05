@@ -1,47 +1,22 @@
-import json, os, pandas, questionary, requests, sys, urllib3
+import os, pandas as pd, questionary, requests, sys, urllib3
 from datetime import datetime
 from dotenv import load_dotenv
 from nominal.core import NominalClient
+from typing import List, Dict, Any
 
-# --- SETUP & CONFIG ---
 
-# API token from .env file
-load_dotenv()
-basicAuth = os.getenv('basicAuth')
-nom_key = os.getenv('nom_key')
-n2yo_key = os.getenv('n2yo_key')
-if not (basicAuth and nom_key and n2yo_key):
-    raise ValueError("Secrets are not set in environment variables")
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# --- CONFIGURATION ---
+def load_env_variables() -> tuple[str, str, str]:
+    load_dotenv()
+    basic_auth = os.getenv('basicAuth')
+    nom_key = os.getenv('nom_key')
+    n2yo_key = os.getenv('n2yo_key')
+    if not (basic_auth and nom_key and n2yo_key):
+        raise ValueError("Secrets are not set in environment variables")
+    return basic_auth, nom_key, n2yo_key
 
-# Get a client to interact with Nominal.
-client = NominalClient.from_token(nom_key)
 
-# --- USER INPUT ---
-
-# Define satellite
-satellite_number = input("Enter the satellite number (e.g. 25544 for ISS): ")
-print()
-
-# Define UDL API
-answer = questionary.select(
-    "Which UDL API should be used?",
-    choices=[
-        questionary.Choice(title="Rest API                  — recent data (30–365 days)", value="Rest API"),
-        questionary.Choice(title="History Rest API          — archived time series (30+ days)", value="History Rest API"),
-        questionary.Choice(title="Bulk Data Request API     — large async downloads (CSV/JSON)", value="Bulk Data Request API"),
-        questionary.Choice(title="Secure Messaging API      — real-time streaming (restricted)", value="Secure Messaging API"),
-    ]
-).ask()
-print()
-
-# Check UDL API selection
-if answer == 'Secure Messaging API':
-    print("Secure Messaging API requires access request. Please contact UDL support for access.")
-    sys.exit()
-
-# Define time window
-def get_valid_date(prompt_label: str = "time") -> datetime:
+def get_valid_date(prompt_label: str) -> datetime:
     while True:
         date_str = input(f"Enter {prompt_label} (ISO 8601, e.g. 2025-07-03T18:30:00.000000Z): ")
         try:
@@ -49,122 +24,112 @@ def get_valid_date(prompt_label: str = "time") -> datetime:
         except ValueError:
             print("Invalid date format. Please use ISO 8601 format.")
 
-start_dt = get_valid_date(prompt_label="start date & time")
-end_dt = get_valid_date(prompt_label="end date & time")
 
-start_time = start_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-end_time = end_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+def select_udl_api() -> str:
+    return questionary.select(
+        "Which UDL API should be used?",
+        choices=[
+            questionary.Choice(title="Rest API                  — recent data (30–365 days)", value="Rest API"),
+            questionary.Choice(title="History Rest API          — archived time series (30+ days)", value="History Rest API"),
+            questionary.Choice(title="Bulk Data Request API     — large async downloads (CSV/JSON)", value="Bulk Data Request API"),
+            questionary.Choice(title="Secure Messaging API      — real-time streaming (restricted)", value="Secure Messaging API"),
+        ]
+    ).ask()
 
-# --- MAKE REQUEST ---
 
-# Define query URL
-base_udl_url = "https://unifieddatalibrary.com"
-query_udl_url = None
+def build_udl_url(api: str, sat_no: str, start: str, end: str) -> str:
+    base = "https://unifieddatalibrary.com"
+    match api:
+        case "Rest API":
+            return f"{base}/udl/statevector?epoch={start}..{end}&satNo={sat_no}"
+        case "History Rest API":
+            return f"{base}/udl/statevector/history?epoch={start}..{end}&satNo={sat_no}"
+        case "Bulk Data Request API":
+            return f"{base}/udl/statevector/history/aodr?epoch={start}..{end}&satNo={sat_no}&outputFormat=JSON"
+        case _:
+            raise ValueError("Unsupported API or restricted access")
 
-if answer == "Rest API":
-    query_udl_url = f"{base_udl_url}/udl/statevector?epoch={start_time}..{end_time}&satNo={satellite_number}"
-elif answer == "History Rest API":
-    query_udl_url = f"{base_udl_url}/udl/statevector/history?epoch={start_time}..{end_time}&satNo={satellite_number}"
-elif answer == "Bulk Data Request API":
-    query_udl_url = f"{base_udl_url}/udl/statevector/history/aodr?epoch={start_time}..{end_time}&satNo={satellite_number}&outputFormat=JSON"
-elif answer == "Secure Messaging API":
-    exit()
 
-if query_udl_url is None:
-    print("Query URL could not be determined.")
-    exit()
+def fetch_udl_data(url: str, auth: str) -> List[Dict[str, Any]]:
+    response = requests.get(url, headers={'Authorization': auth}, verify=False)
+    if response.status_code != 200:
+        raise RuntimeError(f"UDL request failed ({response.status_code}): {response.text}")
+    return response.json()
 
-# Submit request to UDL API
-udl_response = requests.get(query_udl_url, headers={'Authorization': basicAuth}, verify=False)
 
-# Check UDL response status
-if udl_response.status_code == 200:
-    try:
-        data = udl_response.json()
-    except json.decoder.JSONDecodeError:
-        print("udl_response was not valid JSON:")
-        print(udl_response.text)
-        exit()
-else:
-    print(f"Request failed with status code {udl_response.status_code}")
-    print(udl_response.text)
-    exit()
+def parse_statevector(data: List[Dict[str, Any]]) -> pd.DataFrame:
+    parsed: List[Dict[str, float | str]] = []
+    for entry in data:
+        try:
+            parsed.append({
+                'timestamp': entry['epoch'],
+                'pos.x': entry['xpos'],
+                'pos.y': entry['ypos'],
+                'pos.z': entry['zpos'],
+                'vel.x': entry['xvel'],
+                'vel.y': entry['yvel'],
+                'vel.z': entry['zvel'],
+            })
+        except KeyError as e:
+            print(f"Skipping entry due to missing key: {e}")
+    return pd.DataFrame(parsed)
 
-# --- PARSE DATA ---
 
-# Parse data from JSON
-parsed_data: list[dict[str, object]] = []
-for entry in data:
-    try:
-        parsed_data.append({
-            'timestamp': entry['epoch'],
-            'pos.x': entry['xpos'],
-            'pos.y': entry['ypos'],
-            'pos.z': entry['zpos'],
-            'vel.x': entry['xvel'],
-            'vel.y': entry['yvel'],
-            'vel.z': entry['zvel'],
-        })
-    except KeyError as e:
-        print(f'Skipping entry due to missing key: {e}')
+def fetch_satellite_name(sat_no: str, n2yo_key: str) -> str:
+    url = f"https://api.n2yo.com/rest/v1/satellite/tle/{sat_no}&apiKey={n2yo_key}"
+    response = requests.get(url)
+    return response.json()["info"]["satname"]
 
-# Convert data structure
-df = pandas.DataFrame(parsed_data)
-df.to_csv(f'data/satellite_{satellite_number}_data.csv', index=False)
 
-# --- CREATE ASSET ---
+def upload_to_nominal(client: NominalClient, satellite_name: str, sat_no: str, start: str, end: str, df: pd.DataFrame):
+    filename = f"data/satellite_{sat_no}_data.csv"
+    df.to_csv(filename, index=False)
 
-# Look up satellite in N2YO API
-base_n2yo_url = "https://api.n2yo.com/rest/v1/satellite/"
-query_n2yo_url = f"{base_n2yo_url}/tle/{satellite_number}&apiKey={n2yo_key}"
-n2yo_response = requests.get(query_n2yo_url)
-n2yo_data = n2yo_response.json()
-satellite_name = n2yo_data["info"]["satname"]
+    asset = client.create_asset(name=satellite_name, properties={"platform": "satellite", "serial_num": sat_no})
+    dataset = client.create_dataset(
+        name="State Vectors",
+        properties={"platform": "satellite", "serial_num": sat_no},
+        description=f"All state vectors generated between {start} and {end}",
+        prefix_tree_delimiter="."
+    )
+    dataset.add_tabular_data(path=filename, timestamp_column="timestamp", timestamp_type="iso_8601")
+    asset.add_dataset("state_vectors", dataset)
 
-# Create an asset in Nominal
-asset = client.create_asset(
-    name=satellite_name,
-    properties={
-        "platform": "satellite",
-        "serial_num": satellite_number,
-    }
-)
+    client.create_run(
+        name=f"Historical Data between {start} and {end}",
+        start=datetime.fromisoformat(start.replace("Z", "")),
+        end=datetime.fromisoformat(end.replace("Z", "")),
+        properties={"platform": "satellite", "serial_num": sat_no},
+        asset=asset,
+        description=f"All state vectors generated between {start} and {end}"
+    )
 
-# --- UPLOAD DATA ---
 
-# Create dataset
-dataset = client.create_dataset(
-    name="State Vectors",
-    properties={
-        "platform": "satellite",
-        "serial_num": satellite_number,
-    },
-    description=f"All state vectors generated between {start_time} and {end_time}",
-    prefix_tree_delimiter="."
-)
+# --- MAIN ENTRY POINT ---
+def main():
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Add tabular data
-dataset.add_tabular_data(
-    path=f"data/satellite_{satellite_number}_data.csv",
-    timestamp_column="timestamp",
-    timestamp_type="iso_8601"
-)
+    basic_auth, nom_key, n2yo_key = load_env_variables()
+    client = NominalClient.from_token(nom_key)
 
-# Attach dataset
-asset.add_dataset(
-    "state_vectors",
-    dataset,
-)
+    sat_no = input("Enter the satellite number (e.g. 25544 for ISS): ")
+    api = select_udl_api()
+    if api == "Secure Messaging API":
+        print("Secure Messaging API requires access request. Contact UDL support.")
+        sys.exit(1)
 
-# Create run
-run = client.create_run(
-    name=f"Historical Data between {start_time} and {end_time}",
-    start=start_dt,
-    end=end_dt,
-    properties={
-        "platform": "satellite",
-        "serial_num": satellite_number
-    },
-    asset=asset,
-    description=f"All state vectors generated between {start_time} and {end_time}",
-)
+    start_dt = get_valid_date("start date & time")
+    end_dt = get_valid_date("end date & time")
+    start = start_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    end = end_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    url = build_udl_url(api, sat_no, start, end)
+    data = fetch_udl_data(url, basic_auth)
+    df = parse_statevector(data)
+
+    sat_name = fetch_satellite_name(sat_no, n2yo_key)
+    upload_to_nominal(client, sat_name, sat_no, start, end, df)
+
+
+if __name__ == "__main__":
+    main()
