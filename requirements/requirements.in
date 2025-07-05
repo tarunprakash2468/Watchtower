@@ -2,5 +2,6 @@ dotenv
 nominal
 pandas
 questionary
+pytest
 requests
 urllib3

@@ -13,6 +13,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9, 3.10', '3.11', '3.12', '3.13']
     permissions:
       contents: read
 
@@ -30,3 +33,18 @@ jobs:
 
     - name: Sync dependencies
       run: pip-sync requirements/requirements.txt
+
+    - name: Install flake8
+      run: pip install flake8
+
+    - name: Run flake8
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Install test dependencies
+      run: pip install pytest
+
+    - name: Run unit tests
+      run: pytest --disable-warnings --maxfail=1
+    
+    - name: Run basic CLI check
+      run: python core/import_udl_to_nominal.py --help || true
