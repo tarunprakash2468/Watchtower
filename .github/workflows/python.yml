@@ -27,7 +27,7 @@ jobs:
       run: pip-sync requirements.txt
 
     - name: Run script
-      run: python import_udl_to_nominal.py
+      run: python core/import_udl_to_nominal.py
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
