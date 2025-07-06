@@ -34,7 +34,7 @@ def test_main_secure_api_exit(mock_select: MagicMock, mock_input: MagicMock, moc
 
     from core.import_udl_to_nominal import main
     with pytest.raises(SystemExit):
-        main()
+        main([])
 
     mock_print.assert_any_call("Secure Messaging API requires access request. Contact UDL support.")
     mock_exit.assert_called_once_with(1)

@@ -53,7 +53,7 @@ def test_main_integration_flow(
     mock_client.create_dataset.return_value = mock_dataset
 
     # Run the main function (no errors should occur)
-    main()
+    main([])
 
     # ✅ Check key calls
     mock_client.create_asset.assert_called_once()
