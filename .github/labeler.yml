@@ -1,10 +1,13 @@
 ---
 tests:
-  - tests/**/*
-
+  - changed-files:
+      - any-glob-to-any-file: 'tests/**/*'
 core:
-  - core/**/*
-
+  - changed-files:
+      - any-glob-to-any-file: 'core/**/*'
 docs:
-  - README.md
-  - CONTRIBUTING.md
+  - changed-files:
+      - any-glob-to-any-file: 'README.md'
+  - changed-files:
+      - any-glob-to-any-file: 'CONTRIBUTING.md'
+
