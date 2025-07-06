@@ -29,7 +29,7 @@ pip install -e .
 ### 3. Install development dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements/dev.txt
 ```
 
 ### 4. Configure Environment
@@ -94,6 +94,14 @@ make run      # execute the main ingestion script
 Tarun Prakash — [@tarunprakash2468](https://github.com/tarunprakash2468)
 
 Built for satellite telemetry test workflows and backend integration with Nominal.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for
+details. By participating you agree to follow our
+[Code of Conduct](.github/CODE_OF_CONDUCT.md).
 
 ---
 
