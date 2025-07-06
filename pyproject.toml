@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "watchtower-cli"
+version = "0.1.0"
+description = "CLI tool for ingesting satellite telemetry from UDL and uploading to Nominal"
+readme = "README.md"
+authors = [{name = "Tarun Prakash"}]
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+dependencies = [
+    "dotenv",
+    "nominal",
+    "pandas",
+    "questionary",
+    "requests",
+    "urllib3"
+]
+
+[project.scripts]
+watchtower = "core.import_udl_to_nominal:main"
