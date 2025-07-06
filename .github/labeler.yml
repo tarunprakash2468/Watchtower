@@ -1,13 +1,24 @@
+<<<<<<< HEAD
+codex:
+  - base-branch: 'codex/**'
+
+documentation:
+=======
 ---
 tests:
   - changed-files:
       - any-glob-to-any-file: 'tests/**/*'
 core:
+>>>>>>> origin/main
   - changed-files:
       - any-glob-to-any-file: 'core/**/*'
+<<<<<<< HEAD
+      - any-glob-to-any-file: 'connect/**/*'
+=======
 docs:
   - changed-files:
       - any-glob-to-any-file: 'README.md'
   - changed-files:
       - any-glob-to-any-file: 'CONTRIBUTING.md'
 
+>>>>>>> origin/main
