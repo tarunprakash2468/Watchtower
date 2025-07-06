@@ -19,3 +19,14 @@ def test_load_env_variables_valid(mock_load_dotenv: Any):
 def test_load_env_variables_missing(mock_load_dotenv: Any):
     with pytest.raises(ValueError):
         mod.load_env_variables()
+
+
+@patch.dict(os.environ, {
+    'basicAuth': 'YOUR_BASIC_AUTH',
+    'nom_key': '123',
+    'n2yo_key': 'xyz'
+}, clear=True)
+@patch("core.import_udl_to_nominal.load_dotenv")
+def test_load_env_variables_placeholder(mock_load_dotenv: Any):
+    with pytest.raises(ValueError):
+        mod.load_env_variables()
