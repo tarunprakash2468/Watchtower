@@ -29,7 +29,7 @@ from unittest.mock import patch, MagicMock
 @patch("core.import_udl_to_nominal.sys.exit", side_effect=SystemExit)
 @patch("core.import_udl_to_nominal.input", side_effect=["12345", "2025-07-05T00:00:00.000Z", "2025-07-05T01:00:00.000Z"])
 @patch("core.import_udl_to_nominal.questionary.select")
-def test_main_secure_api_exit(mock_select, mock_input, mock_exit, mock_print):
+def test_main_secure_api_exit(mock_select: MagicMock, mock_input: MagicMock, mock_exit: MagicMock, mock_print: MagicMock):
     mock_select.return_value.ask.return_value = "Secure Messaging API"
 
     from core.import_udl_to_nominal import main
