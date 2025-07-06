@@ -1,0 +1,9 @@
+tests:
+  - tests/**/*
+
+core:
+  - core/**/*
+
+docs:
+  - README.md
+  - CONTRIBUTING.md

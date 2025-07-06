@@ -1,7 +1,12 @@
+# Runtime deps
 dotenv
 nominal
 pandas
 questionary
-pytest
 requests
 urllib3
+
+# Dev deps
+pytest
+pytest-cov
+pytest-mock

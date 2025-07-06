@@ -1,0 +1,25 @@
+[run]
+branch = True
+source = core
+parallel = True
+concurrency = thread
+omit =
+    tests/*
+
+[report]
+omit =
+    */__init__.py
+
+[paths]
+source =
+    src
+    */site-packages
+
+[tool:pytest]
+addopts = --tb=short --disable-warnings
+
+[coverage:run]
+include = core/*
+
+[coverage:report]
+show_missing = True
