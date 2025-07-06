@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "watchtower-cli"
-version = "0.1.0"
+version = "0.1.1"
 description = "CLI tool for ingesting satellite telemetry from UDL and uploading to Nominal"
 readme = "README.md"
 authors = [{name = "Tarun Prakash"}]
 license = {file = "LICENSE"}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "dotenv",
     "nominal",

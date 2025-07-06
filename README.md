@@ -93,6 +93,20 @@ You can also invoke `pytest` directly if preferred:
 pytest
 ```
 
+## 📦 Packaging and Release
+
+Build distributable artifacts using `python -m build`:
+
+```bash
+python -m build
+```
+
+This creates a wheel and source distribution under `dist/`. To publish to PyPI run:
+
+```bash
+twine upload dist/*
+```
+
 ---
 
 ## 📘 Resources
