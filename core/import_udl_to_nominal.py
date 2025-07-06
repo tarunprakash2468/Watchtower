@@ -1,8 +1,15 @@
-import os, pandas as pd, questionary, requests, sys, urllib3
+import os
+import sys
 from datetime import datetime
+from typing import List, Dict, Any
+
+import argparse
+import pandas as pd
+import questionary
+import requests
+import urllib3
 from dotenv import load_dotenv
 from nominal.core import NominalClient
-from typing import List, Dict, Any
 
 
 # --- CONFIGURATION ---
@@ -105,21 +112,43 @@ def upload_to_nominal(client: NominalClient, satellite_name: str, sat_no: str, s
     )
 
 
-# --- MAIN ENTRY POINT ---
-def main():
+# --- CLI & MAIN ENTRY POINT ---
+def parse_cli_args(argv: List[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Fetch UDL telemetry and upload to Nominal")
+    parser.add_argument("--sat-no", help="Satellite number (e.g. 25544 for ISS)")
+    parser.add_argument("--api", choices=[
+        "Rest API",
+        "History Rest API",
+        "Bulk Data Request API",
+        "Secure Messaging API",
+    ], help="UDL API to use")
+    parser.add_argument("--start", help="Start datetime in ISO 8601 format")
+    parser.add_argument("--end", help="End datetime in ISO 8601 format")
+    return parser.parse_args(argv)
+
+
+def main(argv: List[str] | None = None):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    args = parse_cli_args(argv)
 
     basic_auth, nom_key, n2yo_key = load_env_variables()
     client = NominalClient.from_token(nom_key)
 
-    sat_no = input("Enter the satellite number (e.g. 25544 for ISS): ")
-    api = select_udl_api()
+    sat_no = args.sat_no or input("Enter the satellite number (e.g. 25544 for ISS): ")
+    api = args.api or select_udl_api()
     if api == "Secure Messaging API":
         print("Secure Messaging API requires access request. Contact UDL support.")
         sys.exit(1)
 
-    start_dt = get_valid_date("start date & time")
-    end_dt = get_valid_date("end date & time")
+    if args.start:
+        start_dt = datetime.fromisoformat(args.start.replace("Z", ""))
+    else:
+        start_dt = get_valid_date("start date & time")
+    if args.end:
+        end_dt = datetime.fromisoformat(args.end.replace("Z", ""))
+    else:
+        end_dt = get_valid_date("end date & time")
     start = start_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     end = end_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
