@@ -56,9 +56,20 @@ Running without arguments will prompt for the same values interactively. Using t
 core/
 ├── import_udl_to_nominal.py      # Main script: pulls UDL data and prepares for Nominal
 data/                             # Output CSV with parsed telemetry
-├── satellite_25544_data.csv      
+├── satellite_25544_data.csv
 ├── satellite_25545_data.csv
 ├── satellite_46826_data.csv
+```
+
+## ⚙️ Makefile Commands
+
+The repository includes a `Makefile` with shortcuts for common tasks:
+
+```bash
+make install  # install Python dependencies
+make lint     # run ruff checks
+make test     # run the test suite
+make run      # execute the main ingestion script
 ```
 
 ---
