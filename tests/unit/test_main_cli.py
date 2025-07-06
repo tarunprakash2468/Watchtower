@@ -1,6 +1,7 @@
 import subprocess
 import sys
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 import pytest
 import os
 
@@ -21,7 +22,6 @@ def test_main_help_flag_runs():
     assert "usage" in result.stdout.lower() or "usage" in result.stderr.lower()
 
 # Test for Secure Messaging API exit path
-from unittest.mock import patch, MagicMock
 
 @patch.dict(os.environ, {"basicAuth": "x", "nom_key": "y", "n2yo_key": "z"}, clear=True)
 
