@@ -16,6 +16,8 @@ conjure-python-client==3.0.0
     #   nominal-api
 dotenv==0.9.9
     # via -r requirements/requirements.in
+execnet==2.1.1
+    # via pytest-xdist
 ffmpeg-python==0.2.0
     # via nominal
 future==1.0.0
@@ -43,6 +45,8 @@ prompt-toolkit==3.0.51
 pygments==2.19.2
     # via pytest
 pytest==8.4.1
+    # via -r requirements/requirements.in
+pytest-xdist==3.8.0
     # via -r requirements/requirements.in
 python-dateutil==2.9.0.post0
     # via
