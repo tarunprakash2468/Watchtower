@@ -6,7 +6,3 @@ questionary
 requests
 urllib3
 
-# Dev deps
-pytest
-pytest-cov
-pytest-mock
