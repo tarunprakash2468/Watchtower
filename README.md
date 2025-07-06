@@ -19,13 +19,20 @@ git clone https://github.com/yourusername/watchtower.git
 cd watchtower
 ```
 
-### 2. Install dependencies
+### 2. Install the CLI
+
+Install the package in editable mode so the `watchtower` command is available:
+
+```bash
+pip install -e .
+```
+### 3. Install development dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment
+### 4. Configure Environment
 
 You’ll need:
 
