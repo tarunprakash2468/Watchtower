@@ -10,7 +10,7 @@
 - 🔗 Integrates with Nominal by preparing data for test runs
 - 📅 Automatically handles UTC timestamps and historical data
 
-## 🛠️ Setup
+## 📦 Installation
 
 ### 1. Clone the repo
 
@@ -44,7 +44,7 @@ Set these as environment variables in a `.env` file or export them manually.
 
 ---
 
-## 🛰️ Pulling and Processing State Vector Data
+## 🚀 Usage
 
 The main script for data ingestion and processing is:
 
@@ -77,6 +77,20 @@ make install  # install Python dependencies
 make lint     # run ruff checks
 make test     # run the test suite
 make run      # execute the main ingestion script
+```
+
+## ✅ Testing
+
+After installing the development dependencies you can run the test suite:
+
+```bash
+make test
+```
+
+You can also invoke `pytest` directly if preferred:
+
+```bash
+pytest
 ```
 
 ---
