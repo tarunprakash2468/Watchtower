@@ -1,5 +1,8 @@
+import os
 from unittest.mock import patch, MagicMock
 from core.import_udl_to_nominal import main
+
+@patch.dict(os.environ, {"basicAuth": "x", "nom_key": "y", "n2yo_key": "z"}, clear=True)
 
 @patch("core.import_udl_to_nominal.requests.get")
 @patch("core.import_udl_to_nominal.NominalClient.from_token")
