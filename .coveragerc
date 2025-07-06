@@ -3,6 +3,8 @@ branch = True
 source = core
 parallel = True
 concurrency = thread
+omit =
+    tests/*
 
 [report]
 omit =
