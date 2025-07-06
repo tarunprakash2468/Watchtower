@@ -4,6 +4,7 @@
 
 install:
 	pip install -r requirements/requirements.txt
+	pip install -r requirements/dev.txt
 
 lint:
 	ruff check .
@@ -13,3 +14,4 @@ test:
 
 run:
 	python core/import_udl_to_nominal.py
+
