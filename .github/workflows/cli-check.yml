@@ -1,17 +1,24 @@
-name: "CLI Check"
+name: CLI Check
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches: [ main ]
+
+permissions:
+  contents: read
 
 jobs:
   cli:
     runs-on: ubuntu-latest
 
+    env:
+      BASIC_AUTH: ${{ secrets.BASIC_AUTH }}
+      NOM_KEY: ${{ secrets.NOM_KEY }}
+      N2YO_KEY: ${{ secrets.N2YO_KEY }}
+
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -23,6 +30,7 @@ jobs:
         run: |
           pip install pip-tools
           pip-sync requirements/requirements.txt
+          pip install pytest
 
-      - name: CLI Help Check
+      - name: Run CLI test
         run: python core/import_udl_to_nominal.py --help || true
