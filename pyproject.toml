@@ -9,7 +9,7 @@ description = "CLI tool for ingesting satellite telemetry from UDL and uploading
 readme = "README.md"
 authors = [{name = "Tarun Prakash"}]
 license = {file = "LICENSE"}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "dotenv",
     "nominal",
