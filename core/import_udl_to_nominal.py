@@ -11,6 +11,12 @@ import urllib3
 from dotenv import load_dotenv
 from nominal.core import NominalClient
 
+PLACEHOLDERS = {
+    'basicAuth': 'YOUR_BASIC_AUTH',
+    'nom_key': 'YOUR_NOMINAL_KEY',
+    'n2yo_key': 'YOUR_N2YO_KEY',
+}
+
 
 # --- CONFIGURATION ---
 def load_env_variables() -> tuple[str, str, str]:
@@ -18,8 +24,20 @@ def load_env_variables() -> tuple[str, str, str]:
     basic_auth = os.getenv('basicAuth')
     nom_key = os.getenv('nom_key')
     n2yo_key = os.getenv('n2yo_key')
-    if not (basic_auth and nom_key and n2yo_key):
+
+    secrets = {
+        'basicAuth': basic_auth,
+        'nom_key': nom_key,
+        'n2yo_key': n2yo_key,
+    }
+
+    if not all(secrets.values()):
         raise ValueError("Secrets are not set in environment variables")
+
+    for key, value in secrets.items():
+        if value == PLACEHOLDERS.get(key):
+            raise ValueError(f"Environment variable {key} is using a placeholder value")
+
     return basic_auth, nom_key, n2yo_key
 
 
