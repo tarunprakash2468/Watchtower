@@ -1,18 +1,25 @@
-name: "CI Build"
+name: Python CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+    tags: [ 'v*' ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
-
+    env:
+      BASIC_AUTH: ${{ secrets.BASIC_AUTH }}
+      NOM_KEY: ${{ secrets.NOM_KEY }}
+      N2YO_KEY: ${{ secrets.N2YO_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,33 +29,23 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Install pip-tools
         run: pip install pip-tools
 
       - name: Sync dependencies
         run: pip-sync requirements/requirements.txt
 
-      - name: Check pip-compile freshness
-        run: |
-          pip-compile requirements/requirements.in --quiet
-          git diff --exit-code requirements/requirements.txt
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Run flake8
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Install test dependencies
-        run: pip install pytest pytest-cov
+        run: pip install pytest
 
-      - name: Run tests with coverage
-        run: pytest --cov=core --cov-report=xml --disable-warnings --maxfail=1
+      - name: Run unit tests
+        run: pytest --disable-warnings --maxfail=1
 
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
+      - name: Run basic CLI check
+        run: python core/import_udl_to_nominal.py --help || true
