@@ -101,7 +101,7 @@ def parse_statevector(data: List[Dict[str, Any]]) -> pd.DataFrame:
 
 
 def fetch_satellite_name(sat_no: str, n2yo_key: str) -> str:
-    url = f"https://api.n2yo.com/rest/v1/satellite/tle/{sat_no}?apiKey={n2yo_key}"
+    url = f"https://api.n2yo.com/rest/v1/satellite/tle/{sat_no}&apiKey={n2yo_key}"
     response = requests.get(url)
     return response.json()["info"]["satname"]
 
