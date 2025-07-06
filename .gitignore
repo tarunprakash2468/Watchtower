@@ -1,2 +1,7 @@
 .env
 .vscode/
+.venv/
+.coverage
+__pycache__/
+core/__pycache__/
+tests/**/__pycache__/
