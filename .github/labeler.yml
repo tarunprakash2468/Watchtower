@@ -1,17 +1,13 @@
-bug:
+---
+tests:
   - changed-files:
-      - any-glob-to-any-file: '**/*'
-    when: contains-commit-message: 'bug'
-
-codex:
-  - base-branch: 'codex/**'
-
-documentation:
+      - any-glob-to-any-file: 'tests/**/*'
+core:
   - changed-files:
-      - any-glob-to-any-file: '**/*.md'
-      - any-glob-to-any-file: 'docs/**/*'
-
-enhancement:
-  - added-files:
       - any-glob-to-any-file: 'core/**/*'
-      - any-glob-to-any-file: 'connect/**/*'
+docs:
+  - changed-files:
+      - any-glob-to-any-file: 'README.md'
+  - changed-files:
+      - any-glob-to-any-file: 'CONTRIBUTING.md'
+

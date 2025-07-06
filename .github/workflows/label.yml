@@ -1,17 +1,21 @@
-bug:
-  - changed-files:
-      - any-glob-to-any-file: '**/*'
-    when: contains-commit-message: 'bug'
+name: "Auto Label PRs"
 
-codex:
-  - base-branch: 'codex/**'
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
-documentation:
-  - changed-files:
-      - any-glob-to-any-file: '**/*.md'
-      - any-glob-to-any-file: 'docs/**/*'
+permissions:
+  contents: read
+  pull-requests: write
 
-enhancement:
-  - added-files:
-      - any-glob-to-any-file: 'core/**/*'
-      - any-glob-to-any-file: 'connect/**/*'
+jobs:
+  label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: actions/labeler@v5
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml
