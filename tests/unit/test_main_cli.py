@@ -23,6 +23,8 @@ def test_main_help_flag_runs():
 # Test for Secure Messaging API exit path
 from unittest.mock import patch, MagicMock
 
+@patch.dict(os.environ, {"basicAuth": "x", "nom_key": "y", "n2yo_key": "z"}, clear=True)
+
 @patch("builtins.print")
 @patch("core.import_udl_to_nominal.sys.exit", side_effect=SystemExit)
 @patch("core.import_udl_to_nominal.input", side_effect=["12345", "2025-07-05T00:00:00.000Z", "2025-07-05T01:00:00.000Z"])
