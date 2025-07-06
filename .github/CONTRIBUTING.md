@@ -75,7 +75,7 @@ Version tags like `v0.1.0` automatically trigger a CI run and draft a GitHub Rel
 
 ## 🙏 Code of Conduct
 
-Please be respectful and inclusive. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) (if available).
+Please be respectful and inclusive. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ---
 
