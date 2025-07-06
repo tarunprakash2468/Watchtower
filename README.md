@@ -97,6 +97,14 @@ Built for satellite telemetry test workflows and backend integration with Nomina
 
 ---
 
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for
+details. By participating you agree to follow our
+[Code of Conduct](.github/CODE_OF_CONDUCT.md).
+
+---
+
 ## 🛡️ License
 
 MIT License
