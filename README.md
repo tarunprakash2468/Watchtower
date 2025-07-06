@@ -1,6 +1,8 @@
 # 🛰️ Watchtower
 
 **Watchtower** is a Python toolchain for ingesting satellite telemetry (state vector) data from the [Unified Data Library (UDL)](https://unifieddatalibrary.com), processing it locally, and integrating it with the [Nominal](https://docs.nominal.io) test data platform.
+For step-by-step instructions, see [docs/instructions.md](docs/instructions.md).
+
 
 ## 🚀 Features
 
@@ -40,7 +42,7 @@ You’ll need:
 - A N2YO API key
 - Nominal API credentials
 
-Set these as environment variables in a `.env` file or export them manually.
+Set these as environment variables in a `.env` file or export them manually to run the full pipeline.
 
 ---
 
