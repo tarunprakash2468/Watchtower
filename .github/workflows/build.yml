@@ -36,14 +36,15 @@ jobs:
       - name: Sync dependencies
         run: pip-sync requirements/requirements.txt
 
+      - name: Install test dependencies
+        run: pip install -r requirements/dev.txt
+
       - name: Install ruff
         run: pip install ruff
 
       - name: Run ruff checks
         run: ruff check .
 
-      - name: Install test dependencies
-        run: pip install pytest
 
       - name: Run unit tests
         run: pytest --disable-warnings --maxfail=1
