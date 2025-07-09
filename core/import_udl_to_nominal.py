@@ -1,7 +1,7 @@
 import os
 import sys
 from datetime import datetime
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any
 
 import argparse
 import pandas as pd
@@ -106,52 +106,6 @@ def fetch_satellite_name(sat_no: str, n2yo_key: str) -> str:
     return response.json()["info"]["satname"]
 
 
-# --- SECURE MESSAGING API HELPERS ---
-def list_topics(auth: str) -> List[Dict[str, Any]]:
-    """Return available Secure Messaging topics."""
-    url = "https://unifieddatalibrary.com/sm/listTopics"
-    resp = requests.get(url, headers={"Authorization": auth}, verify=False)
-    if resp.status_code != 200:
-        raise RuntimeError(f"listTopics failed ({resp.status_code}): {resp.text}")
-    return resp.json()
-
-
-def describe_topic(auth: str, topic: str) -> Dict[str, Any]:
-    """Return metadata for a specific Secure Messaging topic."""
-    url = f"https://unifieddatalibrary.com/sm/describeTopic/{topic}"
-    resp = requests.get(url, headers={"Authorization": auth}, verify=False)
-    if resp.status_code != 200:
-        raise RuntimeError(
-            f"describeTopic failed ({resp.status_code}): {resp.text}"
-        )
-    return resp.json()
-
-
-def get_latest_offset(auth: str, topic: str) -> int:
-    """Return the latest committed offset for a topic."""
-    url = f"https://unifieddatalibrary.com/sm/getLatestOffset/{topic}/"
-    resp = requests.get(url, headers={"Authorization": auth}, verify=False)
-    if resp.status_code != 200:
-        raise RuntimeError(
-            f"getLatestOffset failed ({resp.status_code}): {resp.text}"
-        )
-    return int(resp.text)
-
-
-def get_messages(
-    auth: str, topic: str, offset: int, params: Optional[Dict[str, str]] = None
-) -> Tuple[List[Dict[str, Any]], int]:
-    """Fetch messages from a Secure Messaging topic starting at ``offset``."""
-    url = f"https://unifieddatalibrary.com/sm/getMessages/{topic}/{offset}"
-    resp = requests.get(url, headers={"Authorization": auth}, params=params, verify=False)
-    if resp.status_code != 200 or resp.headers.get("KAFKA_ERROR") == "true":
-        raise RuntimeError(
-            f"getMessages failed ({resp.status_code}): {resp.text}"
-        )
-    next_offset = int(resp.headers.get("KAFKA_NEXT_OFFSET", offset))
-    return resp.json(), next_offset
-
-
 def upload_to_nominal(client: NominalClient, satellite_name: str, sat_no: str, start: str, end: str, df: pd.DataFrame):
     filename = f"data/satellite_{sat_no}_data.csv"
     df.to_csv(filename, index=False)
@@ -201,6 +155,9 @@ def main(argv: List[str] | None = None):
 
     sat_no = args.sat_no or input("Enter the satellite number (e.g. 25544 for ISS): ")
     api = args.api or select_udl_api()
+    if api == "Secure Messaging API":
+        print("Secure Messaging API requires access request. Contact UDL support.")
+        sys.exit(1)
 
     if args.start:
         start_dt = datetime.fromisoformat(args.start.replace("Z", ""))
@@ -212,23 +169,6 @@ def main(argv: List[str] | None = None):
         end_dt = get_valid_date("end date & time")
     start = start_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     end = end_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-
-    if api == "Secure Messaging API":
-        topics = list_topics(basic_auth)
-        print("Available topics:", ", ".join(t["topic"] for t in topics))
-        topic = input("Enter Secure Messaging topic: ") or "statevector"
-        latest = get_latest_offset(basic_auth, topic)
-        messages, _ = get_messages(basic_auth, topic, latest)
-        if topic == "statevector":
-            df = parse_statevector(messages)
-            if not df.empty:
-                sat_name = fetch_satellite_name(sat_no, n2yo_key)
-                start_time = df["timestamp"].iloc[0]
-                end_time = df["timestamp"].iloc[-1]
-                upload_to_nominal(
-                    client, sat_name, sat_no, start_time, end_time, df
-                )
-        return
 
     url = build_udl_url(api, sat_no, start, end)
     data = fetch_udl_data(url, basic_auth)
