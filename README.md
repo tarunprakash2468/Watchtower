@@ -135,4 +135,4 @@ details. By participating you agree to follow our
 
 ## 🛡️ License
 
-MIT License
+[MIT License](LICENSE)
