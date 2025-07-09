@@ -1,24 +1,31 @@
-<<<<<<< HEAD
+---
+# Label rules for GitHub labeler
+
 codex:
   - base-branch: 'codex/**'
 
 documentation:
-=======
----
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+      - any-glob-to-any-file: 'docs/**/*'
+
 tests:
   - changed-files:
       - any-glob-to-any-file: 'tests/**/*'
+
 core:
->>>>>>> origin/main
   - changed-files:
       - any-glob-to-any-file: 'core/**/*'
-<<<<<<< HEAD
+  - changed-files:
       - any-glob-to-any-file: 'connect/**/*'
-=======
+
 docs:
   - changed-files:
       - any-glob-to-any-file: 'README.md'
   - changed-files:
       - any-glob-to-any-file: 'CONTRIBUTING.md'
 
->>>>>>> origin/main
+enhancement:
+  - added-files:
+      - any-glob-to-any-file: 'core/**/*'
+      - any-glob-to-any-file: 'connect/**/*'
