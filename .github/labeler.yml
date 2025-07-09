@@ -1,9 +1,6 @@
 ---
 # Label rules for GitHub labeler
 
-codex:
-  - base-branch: 'codex/**'
-
 documentation:
   - changed-files:
       - any-glob-to-any-file: '**/*.md'
@@ -26,6 +23,6 @@ docs:
       - any-glob-to-any-file: 'CONTRIBUTING.md'
 
 enhancement:
-  - added-files:
+  - changed-files:
       - any-glob-to-any-file: 'core/**/*'
       - any-glob-to-any-file: 'connect/**/*'
