@@ -4,17 +4,17 @@
 documentation:
   - changed-files:
       - any-glob-to-any-file: '**/*.md'
-      - any-glob-to-any-file: 'docs/**/*'
+      - any-glob-to-any-file: 'docs/**'
 
 tests:
   - changed-files:
-      - any-glob-to-any-file: 'tests/**/*'
+      - any-glob-to-any-file: 'tests/**'
 
 core:
   - changed-files:
-      - any-glob-to-any-file: 'core/**/*'
+      - any-glob-to-any-file: 'core/**'
   - changed-files:
-      - any-glob-to-any-file: 'connect/**/*'
+      - any-glob-to-any-file: 'connect/**'
 
 docs:
   - changed-files:
@@ -24,5 +24,8 @@ docs:
 
 enhancement:
   - changed-files:
-      - any-glob-to-any-file: 'core/**/*'
-      - any-glob-to-any-file: 'connect/**/*'
+      - any-glob-to-any-file: 'core/**'
+      - any-glob-to-any-file: 'connect/**'
+
+codex:
+ - head-branch: ['^codex', 'codex']
