@@ -46,14 +46,21 @@ Set these as environment variables in a `.env` file or export them manually.
 
 ## 🚀 Usage
 
-The main script for data ingestion and processing is:
+After installation the `watchtower` command is available on your `$PATH`:
 
 ```bash
-python core/import_udl_to_nominal.py [--sat-no 25544] [--api "Rest API"] \
-    [--start 2025-07-05T00:00:00.000Z] [--end 2025-07-05T01:00:00.000Z]
+watchtower --help
 ```
 
-Running without arguments will prompt for the same values interactively. Using the flags allows non-interactive execution which is useful for automation.
+Invoke it with the desired options, for example:
+
+```bash
+watchtower --sat-no 25544 --api "Rest API" \
+           --start 2025-07-05T00:00:00.000Z \
+           --end 2025-07-05T01:00:00.000Z
+```
+
+The CLI wraps the script at `core/import_udl_to_nominal.py`; you can run that script directly with `python core/import_udl_to_nominal.py` if preferred.  Running without arguments will prompt for the same values interactively.
 
 ---
 
