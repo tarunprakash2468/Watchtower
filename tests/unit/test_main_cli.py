@@ -21,20 +21,17 @@ def test_main_help_flag_runs():
     assert result.returncode in (0, 1)  # your --help might exit(0) or exit(1)
     assert "usage" in result.stdout.lower() or "usage" in result.stderr.lower()
 
-# Test for Secure Messaging API exit path
+# Secure Messaging API triggers streaming
 
 @patch.dict(os.environ, {"basicAuth": "x", "nom_key": "y", "n2yo_key": "z"}, clear=True)
 
-@patch("builtins.print")
-@patch("core.import_udl_to_nominal.sys.exit", side_effect=SystemExit)
-@patch("core.import_udl_to_nominal.input", side_effect=["12345", "2025-07-05T00:00:00.000Z", "2025-07-05T01:00:00.000Z"])
+@patch("core.import_udl_to_nominal.stream_secure_messaging_to_nominal")
+@patch("core.import_udl_to_nominal.input", side_effect=["12345", "statevector"])
 @patch("core.import_udl_to_nominal.questionary.select")
-def test_main_secure_api_exit(mock_select: MagicMock, mock_input: MagicMock, mock_exit: MagicMock, mock_print: MagicMock):
+def test_main_secure_api_stream(mock_select: MagicMock, mock_input: MagicMock, mock_stream: MagicMock):
     mock_select.return_value.ask.return_value = "Secure Messaging API"
 
     from core.import_udl_to_nominal import main
-    with pytest.raises(SystemExit):
-        main([])
+    main([])
 
-    mock_print.assert_any_call("Secure Messaging API requires access request. Contact UDL support.")
-    mock_exit.assert_called_once_with(1)
+    mock_stream.assert_called_once()

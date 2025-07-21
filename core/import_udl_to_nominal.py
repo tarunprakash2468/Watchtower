@@ -8,6 +8,7 @@ import pandas as pd
 import questionary
 import requests
 import urllib3
+import time
 from dotenv import load_dotenv
 from nominal.core import NominalClient
 
@@ -130,6 +131,55 @@ def upload_to_nominal(client: NominalClient, satellite_name: str, sat_no: str, s
     )
 
 
+def stream_secure_messaging_to_nominal(
+    client: NominalClient,
+    auth: str,
+    topic: str,
+    asset_name: str,
+    *,
+    max_messages: int = 10,
+    sample_period: float = 0.34,
+) -> None:
+    """Stream real-time UDL data to Nominal using Secure Messaging."""
+
+    session = requests.Session()
+    session.headers.update({"Authorization": auth})
+
+    last_offset_url = f"https://unifieddatalibrary.com/sm/getLatestOffset/{topic}/"
+    get_url_root = f"https://unifieddatalibrary.com/sm/getMessages/{topic}/"
+
+    last_offset = int(session.get(last_offset_url, verify=False).text)
+
+    asset = client.create_asset(name=asset_name, properties={"topic": topic})
+    dataset = client.create_dataset(
+        name=f"{topic} Stream",
+        description=f"Live data from {topic}",
+        prefix_tree_delimiter=".",
+    )
+    asset.add_dataset("stream", dataset)
+
+    processed = 0
+    with dataset.get_write_stream(batch_size=1) as stream:
+        while processed < max_messages:
+            response = session.get(get_url_root + str(last_offset), verify=False)
+            response.raise_for_status()
+            messages = response.json()
+            for msg in messages:
+                ts = msg["epoch"]
+                stream.enqueue("pos.x", ts, msg["xpos"])
+                stream.enqueue("pos.y", ts, msg["ypos"])
+                stream.enqueue("pos.z", ts, msg["zpos"])
+                stream.enqueue("vel.x", ts, msg["xvel"])
+                stream.enqueue("vel.y", ts, msg["yvel"])
+                stream.enqueue("vel.z", ts, msg["zvel"])
+                processed += 1
+                if processed >= max_messages:
+                    break
+            last_offset = int(response.headers.get("KAFKA_NEXT_OFFSET") or last_offset)
+            if processed < max_messages:
+                time.sleep(sample_period)
+
+
 # --- CLI & MAIN ENTRY POINT ---
 def parse_cli_args(argv: List[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Fetch UDL telemetry and upload to Nominal")
@@ -142,6 +192,7 @@ def parse_cli_args(argv: List[str] | None = None) -> argparse.Namespace:
     ], help="UDL API to use")
     parser.add_argument("--start", help="Start datetime in ISO 8601 format")
     parser.add_argument("--end", help="End datetime in ISO 8601 format")
+    parser.add_argument("--topic", help="Secure messaging topic (for Secure Messaging API)")
     return parser.parse_args(argv)
 
 
@@ -156,8 +207,9 @@ def main(argv: List[str] | None = None):
     sat_no = args.sat_no or input("Enter the satellite number (e.g. 25544 for ISS): ")
     api = args.api or select_udl_api()
     if api == "Secure Messaging API":
-        print("Secure Messaging API requires access request. Contact UDL support.")
-        sys.exit(1)
+        topic = args.topic or input("Enter Secure Messaging topic (e.g. statevector): ")
+        stream_secure_messaging_to_nominal(client, basic_auth, topic, sat_no)
+        return
 
     if args.start:
         start_dt = datetime.fromisoformat(args.start.replace("Z", ""))
