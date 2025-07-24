@@ -1,8 +1,0 @@
-# Runtime deps
-python-dotenv
-nominal
-pandas
-questionary
-requests
-urllib3
-connect-python
