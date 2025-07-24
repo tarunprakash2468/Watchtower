@@ -7,3 +7,4 @@ core/__pycache__/
 tests/**/__pycache__/
 .DS_Store
 .pytest_cache/
+watchtower_cli.egg-info/

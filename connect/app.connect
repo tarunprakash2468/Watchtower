@@ -11,12 +11,12 @@ scene:
   relative_latitude_longitude: false
   models:
     - path: satellite.glb
-      name: Satellite-1
+      name: UDL Satellite
       initial_altitude: 5900000.0
       infer_heading: false
       camera_follow: true
       stream:
-        id: sat1
+        id: statevector
         color: red
         dotted: true
         channel_mapping:
@@ -32,19 +32,29 @@ bottom_panel:
   layout:
     - controls: script_table
       scripts:
-        - label: Sim Satellite
-          path: synth_replay.py
+        - label: UDL Stream
+          path: stream_udl.py
 
 left_panel:
   width: 0.2
-  tabs:
-    - name: Altitude
-      layout:
-        - title: Altitude
-          plot: line
-          stream_id: sat1
-          channels: ["altitude"]
-          x_label: Time (s)
+  layout:
+    - id: basic_auth
+      label: UDL Token
+      input: text
+    - id: topic
+      label: Secure Messaging Topic
+      input: text
+      default: statevector
+    - id: sample_period
+      input: slider
+      min: 0.1
+      max: 2
+      default: 0.34
+    - title: Altitude
+      plot: line
+      stream_id: statevector
+      channels: ["altitude"]
+      x_label: Time (s)
 
 right_panel:
   width: 0.2
@@ -53,11 +63,11 @@ right_panel:
       layout:
         - title: Latitude
           plot: line
-          stream_id: sat1
+          stream_id: statevector
           channels: ["latitude"]
           x_label: Time (s)
         - title: Longitude
           plot: line
-          stream_id: sat1
+          stream_id: statevector
           channels: ["longitude"]
           x_label: Time (s)
