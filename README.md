@@ -60,6 +60,20 @@ watchtower --sat-no 25544 --api "Rest API" \
            --end 2025-07-05T01:00:00.000Z
 ```
 
+To stream real-time Secure Messaging data and send it to both Core and
+Connect:
+
+```bash
+watchtower --sat-no 25544 --api "Secure Messaging API" \
+           --topic statevector --connect
+```
+
+Launch the Connect viewer in another terminal to see the live 3D visualization:
+
+```bash
+connect app.connect
+```
+
 The CLI wraps the script at `core/import_udl_to_nominal.py`; you can run that script directly with `python core/import_udl_to_nominal.py` if preferred.  Running without arguments will prompt for the same values interactively.
 
 ---

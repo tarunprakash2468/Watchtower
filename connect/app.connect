@@ -1,0 +1,63 @@
+streaming:
+  buffer_size: 20_000
+  playback_speed: 0.25
+
+timeline:
+  show: true
+
+scene:
+  load_earth: true
+  show_grid: false
+  relative_latitude_longitude: false
+  models:
+    - path: satellite.glb
+      name: Satellite-1
+      initial_altitude: 5900000.0
+      infer_heading: false
+      camera_follow: true
+      stream:
+        id: sat1
+        color: red
+        dotted: true
+        channel_mapping:
+          position:
+            latitude: latitude
+            longitude: longitude
+            altitude: altitude
+            pitch: pitch
+            heading: heading
+            roll: roll
+
+bottom_panel:
+  layout:
+    - controls: script_table
+      scripts:
+        - label: Sim Satellite
+          path: synth_replay.py
+
+left_panel:
+  width: 0.2
+  tabs:
+    - name: Altitude
+      layout:
+        - title: Altitude
+          plot: line
+          stream_id: sat1
+          channels: ["altitude"]
+          x_label: Time (s)
+
+right_panel:
+  width: 0.2
+  tabs:
+    - name: Latitude and Longitude
+      layout:
+        - title: Latitude
+          plot: line
+          stream_id: sat1
+          channels: ["latitude"]
+          x_label: Time (s)
+        - title: Longitude
+          plot: line
+          stream_id: sat1
+          channels: ["longitude"]
+          x_label: Time (s)
