@@ -138,8 +138,9 @@ def stream_secure_messaging_to_nominal(
     *,
     max_messages: int = 10,
     sample_period: float = 0.34,
+    send_to_connect: bool = False,
 ) -> None:
-    """Stream real-time UDL data to Nominal using Secure Messaging."""
+    """Stream real-time UDL data to Nominal Core and optionally Connect."""
 
     session = requests.Session()
     session.headers.update({"Authorization": auth})
@@ -157,6 +158,15 @@ def stream_secure_messaging_to_nominal(
     )
     asset.add_dataset("stream", dataset)
 
+    connect_client = None
+    if send_to_connect:
+        try:
+            import connect_python
+            connect_client = connect_python.Client()
+            connect_client.clear_stream("statevector")
+        except Exception as exc:  # pragma: no cover - optional dependency
+            print(f"Failed to initialise Connect client: {exc}")
+
     processed = 0
     with dataset.get_write_stream(batch_size=1) as stream:
         while processed < max_messages:
@@ -171,6 +181,20 @@ def stream_secure_messaging_to_nominal(
                 stream.enqueue("vel.x", ts, msg["xvel"])
                 stream.enqueue("vel.y", ts, msg["yvel"])
                 stream.enqueue("vel.z", ts, msg["zvel"])
+                if connect_client:
+                    connect_client.stream(
+                        "statevector",
+                        ts,
+                        names=["x", "y", "z", "vx", "vy", "vz"],
+                        values=[
+                            msg["xpos"],
+                            msg["ypos"],
+                            msg["zpos"],
+                            msg["xvel"],
+                            msg["yvel"],
+                            msg["zvel"],
+                        ],
+                    )
                 processed += 1
                 if processed >= max_messages:
                     break
@@ -192,6 +216,7 @@ def parse_cli_args(argv: List[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--start", help="Start datetime in ISO 8601 format")
     parser.add_argument("--end", help="End datetime in ISO 8601 format")
     parser.add_argument("--topic", help="Secure messaging topic (for Secure Messaging API)")
+    parser.add_argument("--connect", action="store_true", help="Also stream data to Nominal Connect")
     return parser.parse_args(argv)
 
 
@@ -207,7 +232,13 @@ def main(argv: List[str] | None = None):
     api = args.api or select_udl_api()
     if api == "Secure Messaging API":
         topic = args.topic or input("Enter Secure Messaging topic (e.g. statevector): ")
-        stream_secure_messaging_to_nominal(client, basic_auth, topic, sat_no)
+        stream_secure_messaging_to_nominal(
+            client,
+            basic_auth,
+            topic,
+            sat_no,
+            send_to_connect=args.connect,
+        )
         return
 
     if args.start:
