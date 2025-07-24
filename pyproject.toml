@@ -21,11 +21,12 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["core", "connect"]
+package-dir = { "" = "src" }
+packages = { find = { where = ["src"], include = ["watchtower*"] } }
 
 [tool.setuptools.package-data]
-"connect" = ["*.connect"]
+"watchtower.connect" = ["*.connect"]
 
 [project.scripts]
-watchtower = "core.import_udl_to_nominal:main"
-watchtower-connect = "connect.cli:main"
+watchtower = "watchtower.core.import_udl_to_nominal:main"
+watchtower-connect = "watchtower.connect.cli:main"
