@@ -20,5 +20,12 @@ dependencies = [
     "connect-python"
 ]
 
+[tool.setuptools]
+packages = ["core", "connect"]
+
+[tool.setuptools.package-data]
+"connect" = ["*.connect"]
+
 [project.scripts]
 watchtower = "core.import_udl_to_nominal:main"
+watchtower-connect = "connect.cli:main"

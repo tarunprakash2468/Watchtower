@@ -52,6 +52,13 @@ After installation the `watchtower` command is available on your `$PATH`:
 watchtower --help
 ```
 
+Other entrypoints installed with the package:
+
+- `watchtower-connect` – launch the packaged Connect app (requires the Nominal
+  `connect` command on your `$PATH`)
+- `python core/import_udl_to_nominal.py` – run the ingestion script directly
+- `python -m connect.stream_udl` – stream live Secure Messaging data
+
 Invoke it with the desired options, for example:
 
 ```bash
@@ -61,17 +68,19 @@ watchtower --sat-no 25544 --api "Rest API" \
 ```
 
 To stream real-time Secure Messaging data and send it to both Core and
-Connect:
+Nominal Connect:
 
 ```bash
 watchtower --sat-no 25544 --api "Secure Messaging API" \
            --topic statevector --connect
 ```
 
-Launch the Connect viewer in another terminal to see the live 3D visualization:
+Launch the Connect viewer in another terminal to see the live 3D visualization.
+The packaged app can be launched with the `watchtower-connect` command (requires
+the `connect` CLI from Nominal Connect to be installed):
 
 ```bash
-connect app.connect
+watchtower-connect
 ```
 
 The CLI wraps the script at `core/import_udl_to_nominal.py`; you can run that script directly with `python core/import_udl_to_nominal.py` if preferred.  Running without arguments will prompt for the same values interactively.
