@@ -25,7 +25,7 @@ conjure-python-client==3.0.0
     #   nominal
     #   nominal-api
 connect-python==0.4.2
-    # via -r /workspace/Watchtower/requirements/requirements.in
+    # via -r requirements.in
 coverage[toml]==7.9.2
     # via pytest-cov
 execnet==2.1.1
@@ -49,8 +49,8 @@ multidict==6.6.3
     #   aiohttp
     #   connect-python
     #   yarl
-nominal==1.69.1
-    # via -r /workspace/Watchtower/requirements/requirements.in
+nominal==1.71.0
+    # via -r requirements.in
 nominal-api==0.778.1
     # via nominal
 numpy==2.3.1
@@ -59,7 +59,7 @@ packaging==25.0
     # via pytest
 pandas==2.3.1
     # via
-    #   -r /workspace/Watchtower/requirements/requirements.in
+    #   -r requirements.in
     #   nominal
 pluggy==1.6.0
     # via
@@ -77,31 +77,31 @@ pygments==2.19.2
     # via pytest
 pytest==8.4.1
     # via
-    #   -r requirements/dev.in
+    #   -r dev.in
     #   pytest-cov
     #   pytest-mock
     #   pytest-xdist
 pytest-cov==6.2.1
-    # via -r requirements/dev.in
+    # via -r dev.in
 pytest-mock==3.14.1
-    # via -r requirements/dev.in
+    # via -r dev.in
 pytest-xdist==3.8.0
-    # via -r requirements/dev.in
+    # via -r dev.in
 python-dateutil==2.9.0.post0
     # via
     #   nominal
     #   pandas
 python-dotenv==1.1.1
-    # via -r /workspace/Watchtower/requirements/requirements.in
+    # via -r requirements.in
 pytz==2025.2
     # via pandas
 pyyaml==6.0.2
     # via nominal
 questionary==2.1.0
-    # via -r /workspace/Watchtower/requirements/requirements.in
+    # via -r requirements.in
 requests==2.32.4
     # via
-    #   -r /workspace/Watchtower/requirements/requirements.in
+    #   -r requirements.in
     #   conjure-python-client
     #   nominal
     #   nominal-api
@@ -119,7 +119,7 @@ tzdata==2025.2
     # via pandas
 urllib3==2.5.0
     # via
-    #   -r /workspace/Watchtower/requirements/requirements.in
+    #   -r requirements.in
     #   connect-python
     #   requests
 wcwidth==0.2.13
