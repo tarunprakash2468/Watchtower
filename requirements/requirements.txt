@@ -25,7 +25,7 @@ conjure-python-client==3.0.0
     #   nominal
     #   nominal-api
 connect-python==0.4.2
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 ffmpeg-python==0.2.0
     # via nominal
 frozenlist==1.7.0
@@ -43,15 +43,15 @@ multidict==6.6.3
     #   aiohttp
     #   connect-python
     #   yarl
-nominal==1.69.1
-    # via -r requirements/requirements.in
+nominal==1.71.0
+    # via -r requirements.in
 nominal-api==0.778.1
     # via nominal
 numpy==2.3.1
     # via pandas
 pandas==2.3.1
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   nominal
 prompt-toolkit==3.0.51
     # via questionary
@@ -66,16 +66,16 @@ python-dateutil==2.9.0.post0
     #   nominal
     #   pandas
 python-dotenv==1.1.1
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 pytz==2025.2
     # via pandas
 pyyaml==6.0.2
     # via nominal
 questionary==2.1.0
-    # via -r requirements/requirements.in
+    # via -r requirements.in
 requests==2.32.4
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   conjure-python-client
     #   nominal
     #   nominal-api
@@ -86,12 +86,14 @@ tabulate==0.9.0
 types-cachetools==6.1.0.20250717
     # via nominal
 typing-extensions==4.14.1
-    # via nominal
+    # via
+    #   aiosignal
+    #   nominal
 tzdata==2025.2
     # via pandas
 urllib3==2.5.0
     # via
-    #   -r requirements/requirements.in
+    #   -r requirements.in
     #   connect-python
     #   requests
 wcwidth==0.2.13
